@@ -3,15 +3,20 @@ CFLAGS =
 DEPS =
 OBJ = pause.o
 
-.PHONY: all clean
+.PHONY: all clean docker
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-pause: $(OBJ)
+bin/pause: $(OBJ)
 	gcc -o $@ $^ $(CFLAGS)
 
-all: pause
+docker: Dockerfile
+	docker run --rm \
+	       -v $(shell pwd)/bin:/usr/src/pause/bin \
+				 $(shell docker build -q .)
+
+all: bin/pause
 
 clean:
-	rm -f *.o 
+	rm -f *.o
